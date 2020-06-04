@@ -1,5 +1,7 @@
 include ':inversion-api'
+include ':inversion-jdbc'
 include ':inversion-spring-boot'
 
 project(':inversion-api').projectDir = new File(settingsDir, '../inversion-engine/inversion-api/')
+project(':inversion-jdbc').projectDir = new File(settingsDir, '../inversion-engine/inversion-jdbc/')
 project(':inversion-spring-boot').projectDir = new File(settingsDir, '../inversion-engine/inversion-spring-boot/')

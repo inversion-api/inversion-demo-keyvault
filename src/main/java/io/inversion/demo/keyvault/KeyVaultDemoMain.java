@@ -29,20 +29,28 @@ import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 import com.azure.security.keyvault.secrets.models.SecretProperties;
 
 import io.inversion.Api;
-import io.inversion.action.misc.MockAction;
+import io.inversion.action.db.DbAction;
+import io.inversion.jdbc.JdbcDb;
 import io.inversion.spring.InversionApp;
 import io.inversion.utils.Config;
 import io.inversion.utils.Utils;
 
 /**
- * Example of how to add secrets from an Azure KeyVault into the Inversion configuration at runtime. 
+ * Example of how database connectivity settings can be pulled from an Azure KeyVault at runtime. 
+ *  
+ * 
+ * @see <a href="https://inversion-api.github.io/inversion-engine/javadoc/io/inversion/jdbc/JdbcDb.html">io.inversion.jdbc.JdbcDb</a>
+ * @see <a href="https://inversion-api.github.io/inversion-engine/javadoc/io/inversion/utils/Config.html">io.inversion.utils.Config</a>
+ * @see <a href="http://commons.apache.org/proper/commons-configuration/apidocs/org/apache/commons/configuration2/CombinedConfiguration.html">org.apache.commons.configuration2.CombinedConfiguration</a>
+ * 
  */
 public class KeyVaultDemoMain
 {
    public static void main(String[] args)
    {
       //-- pull all the secrets from the KeyVault
-      //-- for demo purposes, assume there are secrets for 'myAction.statusCode' and 'myAction.jsonUrl' 
+      //-- for demo purposes, assume secrets for 'myDb.driver','myDb.url',
+      //-- 'myDb.user','myDb.pass' are in the vault
       PropertiesConfiguration secretsConf = new PropertiesConfiguration();
 
       //-- TODO: this KeyVault integration has not been tested.  The main point of this example is 
@@ -77,17 +85,15 @@ public class KeyVaultDemoMain
       //-- add the secrets to the start of the composite list so that keyvaut values are pulled first
       config.addConfigurationFirst(secretsConf);
 
-      //-- now wire up your api. bean properties for all named objects will be reflectively set 
-      MockAction mockAction = new MockAction().withName("myAction");
-      Api api = new Api().withEndpoint("*", "*", mockAction);
+      //-- now wire up your api. 
+      //-- bean properties for all named objects will be reflectively set
 
-      //-- Running the app causes Engine.startup to be called which is where
-      //-- the reflective bean property setting happens.
+      Api api = new Api()//
+                         .withDb(new JdbcDb().withName("myDb"))//
+                         .withEndpoint("*", "*", new DbAction());
+
+      //-- runs the Api as a spring boot app
       InversionApp.run(api);
-
-      System.out.println("Azure KeyVault Secret 'myAction.statusCode' has been used to configure the action with property 'statusCode' value: " + mockAction.getStatusCode());
-      System.out.println("Azure KeyVault Secret 'myAction.jsonUrl' has been used to configure the action with 'jsonUrl' value: " + mockAction.getJsonUrl());
-
    }
 
 }
