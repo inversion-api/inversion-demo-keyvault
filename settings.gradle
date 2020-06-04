@@ -1,0 +1,5 @@
+include ':inversion-api'
+include ':inversion-spring-boot'
+
+project(':inversion-api').projectDir = new File(settingsDir, '../inversion-engine/inversion-api/')
+project(':inversion-spring-boot').projectDir = new File(settingsDir, '../inversion-engine/inversion-spring-boot/')
